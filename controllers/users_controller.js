@@ -9,11 +9,17 @@ module.exports.posts=function(req,res){
     res.end('<h1>posts</h1>')
 }
 module.exports.signUp=function(req,res){
+    if(req.isAuthenticated()){
+        res.redirect('/users/profile')
+    }
     return res.render('user_signUp',{
      title:"worldly | SignUp"
     })
 }
 module.exports.signIn=function(req,res){
+    if(req.isAuthenticated()){
+        res.redirect('/users/profile')
+    }
    return res.render('user_signIn',{
        title:"worldly | SignIn"
    })
@@ -42,5 +48,10 @@ module.exports.create=function(req,res){
 }
 //enter sign in details
 module.exports.createSession=function(req,res){
-    //TODO
+    return res.redirect('/');
+}
+
+module.exports.destroySession=function(req,res){
+    req.logout();
+    return res.redirect('/');
 }
