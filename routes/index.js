@@ -6,5 +6,8 @@ const trial_controller=require('../controllers/trial_controller');
 
 router.get('/',homeController.home)
 router.use('/users',require('./users'))
-router.get('/trial',trial_controller.trial);
+router.use('/posts',require('./posts'));
+router.use('/comments',require('./comments'));
+//for any futher routes,access from here
+//router.use('/routername',require('./routerfile'));
 module.exports=router;
