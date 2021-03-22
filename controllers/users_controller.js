@@ -1,57 +1,82 @@
-const { user } = require('../config/mongoose');
 const User = require('../models/user');
-module.exports.profiles=function(req,res){
-   return res.render('user',{
-       title:'users'
-   });
+
+
+module.exports.profile = function(req, res){
+    User.findById(req.params.id, function(err, user){
+        return res.render('user_profile', {
+            title: 'User Profile',
+            profile_user: user
+        });
+    });
+
 }
-module.exports.posts=function(req,res){
-    res.end('<h1>posts</h1>')
-}
-module.exports.signUp=function(req,res){
-    if(req.isAuthenticated()){
-        res.redirect('/users/profile')
+
+
+module.exports.update=function(req,res){
+    if(req.user.id==req.params.id){
+        User.findByIdAndUpdate(req.params.id,req.body,function(err,user){
+            return res.redirect('back');
+        });
     }
-    return res.render('user_signUp',{
-     title:"worldly | SignUp"
+    else{
+        return res.status(401).send('Unauthorized');
+    }
+}
+
+// render the sign up page
+module.exports.signUp = function(req, res){
+    if (req.isAuthenticated()){
+        return res.redirect('/users/profile');
+    }
+
+
+    return res.render('user_signUp', {
+        title: "Worldly | Sign Up"
     })
 }
-module.exports.signIn=function(req,res){
-    if(req.isAuthenticated()){
-        res.redirect('/users/profile')
+
+
+// render the sign in page
+module.exports.signIn = function(req, res){
+
+    if (req.isAuthenticated()){
+        return res.redirect('/users/profile');
     }
-   return res.render('user_signIn',{
-       title:"worldly | SignIn"
-   })
+    return res.render('user_signIn', {
+        title: "Worldly | Sign In"
+    })
 }
-//enter sign up details
-module.exports.create=function(req,res){
-    if(req.body.password!=req.body.confirm_password){
+
+// get the sign up data
+module.exports.create = function(req, res){
+    if (req.body.password != req.body.confirm_password){
         return res.redirect('back');
     }
-    User.findOne({email : req.body.email},function(err,user){
-        if(err){
-            console.log("ERROR IN FINDONE EMAIL FUNCTION");return;
-        }
-        if(!user){
-            User.create(req.body,function(err,user){
-                if(err){
-                    console.log("ERROR IN creating user");return;
-                }
+
+    User.findOne({email: req.body.email}, function(err, user){
+        if(err){console.log('error in finding user in signing up'); return}
+
+        if (!user){
+            User.create(req.body, function(err, user){
+                if(err){console.log('error in creating user while signing up'); return}
+
                 return res.redirect('/users/sign-in');
             })
-        }
-        else{
+        }else{
             return res.redirect('back');
         }
-    })
+
+    });
 }
-//enter sign in details
-module.exports.createSession=function(req,res){
+
+
+// sign in and create a session for the user
+module.exports.createSession = function(req, res){
     return res.redirect('/');
 }
 
-module.exports.destroySession=function(req,res){
+module.exports.destroySession = function(req, res){
     req.logout();
+
     return res.redirect('/');
 }
